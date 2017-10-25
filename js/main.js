@@ -126,7 +126,7 @@ function  drawBoard(w,r){
 }
 
 //画棋子
-function onestep(i, j, me) {  
+function oneStep(i, j, me) {  
     ctx.beginPath();  
     ctx.arc(20 + i * 2*20, 15 + j * 2*20, 15, 0, 2 * Math.PI);  
     var gradient = ctx.createRadialGradient(20 + i * 2*20 + 2, 20 + j * 2*20 - 2, 15, 20 + i * 2*20 + 2, 15 + j * 2*20 - 2, 0);  
@@ -164,7 +164,7 @@ function myClick(e){
 	i = Math.floor(x / (2*20));  
     j = Math.floor(y / (2*20)); 
     if(chessBoard[i][j] == 0){
-	    onestep(i, j, me); 
+	    oneStep(i, j, me); 
     	chessBoard[i][j] = 1;
     	bx = i;
         by = j;
@@ -255,7 +255,7 @@ function computerAI(){
             }
         }
     }
-    onestep(u,v,0);
+    oneStep(u,v,0);
     chessBoard[u][v] =2;
     wx = u;
     wy = v;
@@ -332,6 +332,26 @@ retract.onclick = function () {
         if (wins[wx][wy][k]) {
             computerWin[k]--;
             myWin[k] = myWinValue;
+        }
+    }
+}
+
+//撤销悔棋
+backout.onclick = function () {
+    if (backBtn) {
+        chessBoard[bx][by] = 2;
+        chessBoard[wx][wy] = 1;
+        oneStep(bx, by, true);
+        oneStep(wx, wy, false);
+        for (var k = 0; k < count; k++) {
+            if (wins[bx][by][k]) {
+                myWin[k]++;
+                computerWin[k] = -1;
+            }
+            if (wins[wx][wy][k]) {
+                computerWin[k]++;
+                myWin[k] = -1;
+            }
         }
     }
 }
