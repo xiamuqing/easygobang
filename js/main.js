@@ -18,6 +18,15 @@ var over = false;
 var haveChess = false;
 //是否点击了开始按钮
 var startBtn = false;
+//是否点击了悔棋按钮
+var backBtn = false;
+//保存点击悔棋按钮之前赢法统计数组(computerWin,myWin)的值
+var cWinValue, myWinValue;
+
+//悔棋时黑子下棋坐标
+var bx = 0, by = 0;
+//悔棋时白棋下棋坐标
+var wx = 0, wy = 0;
 
 //存储棋盘落子情况
 //0:无子 1:黑棋 2:白棋
@@ -157,6 +166,9 @@ function myClick(e){
     if(chessBoard[i][j] == 0){
 	    onestep(i, j, me); 
     	chessBoard[i][j] = 1;
+    	bx = i;
+        by = j;
+        backBtn = false;
     	for(var k =0 ;k<count;k++){
     		if(wins[i][j][k]){
     			myWin[k]++;
@@ -245,6 +257,8 @@ function computerAI(){
     }
     onestep(u,v,0);
     chessBoard[u][v] =2;
+    wx = u;
+    wy = v;
     for(var k =0 ;k<count;k++){
 		if(wins[u][v][k]){
 			computerWin[k]++;
@@ -288,4 +302,36 @@ start.onclick = function () {
         haveChess = false;
     }
 
+}
+//点击悔棋按钮
+retract.onclick = function () {
+    backBtn = true;
+    chessBoard[bx][by] = 0;
+    chessBoard[wx][wy] = 0;
+    //擦除棋子
+    ctx.clearRect(bx * (2*20), by * (2*20), (2*20), (2*20));
+    ctx.clearRect(wx * (2*20), wy * (2*20), (2*20), (2*20));
+    //补齐网格
+    ctx.beginPath();
+    ctx.moveTo(bx * (2*20), by * (2*20) + 20);
+    ctx.lineTo(bx * (2*20) + (2*20), by * (2*20) + 20);
+    ctx.moveTo(bx * (2*20) + 20, by * (2*20));
+    ctx.lineTo(bx * (2*20) + 20, by * (2*20) + (2*20));
+    ctx.moveTo(wx * (2*20), wy * (2*20) + 20);
+    ctx.lineTo(wx * (2*20) + (2*20), wy * (2*20) + 20);
+    ctx.moveTo(wx * (2*20) + 20, wy * (2*20));
+    ctx.lineTo(wx * (2*20) + 20, wy * (2*20) + (2*20));
+    ctx.stroke();
+    ctx.closePath();
+    //减去悔棋位置的赢法
+    for (var k = 0; k < count; k++) {
+        if (wins[bx][by][k]) {
+            myWin[k]--;
+            computerWin[k] = cWinValue;
+        }
+        if (wins[wx][wy][k]) {
+            computerWin[k]--;
+            myWin[k] = myWinValue;
+        }
+    }
 }
