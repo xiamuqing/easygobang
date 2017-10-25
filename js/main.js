@@ -15,15 +15,63 @@ var me = true;
 //存储棋盘落子情况
 //0:无子 1:黑棋 2:白棋
 var chessBoard = [];
+
+//存储所有赢法
+var wins =[];
+
+//赢法个数
+var count = 0;
+
+//初始化chessBoard、wins数组
 for(var i= 0; i<15;i++){
 	chessBoard[i]=[];
+	wins[i] =[];
 	for(var j = 0;j<15;j++){
 		chessBoard[i][j] =0;
+		wins[i][j]=[];
 	}
 }
 
 
 drawBoard(600,20);
+
+//所有竖线赢法|
+for (var i = 0; i < 15; i++) {  
+ for (var j = 0; j < 11; j++) {  
+     for (var k = 0; k < 5; k++) {  
+         wins[i][j + k][count] = true;  
+     }  
+     count++;  
+ }  
+}  
+//所有横线线赢法-
+for (var i = 0; i < 15; i++) {  
+ for (var j = 0; j < 11; j++) {  
+     for (var k = 0; k < 5; k++) {  
+         wins[j + k][i][count] = true;  
+     }  
+     count++;  
+ }  
+}  
+//所有斜线赢法 /
+for (var i = 0; i < 11; i++) {  
+ for (var j = 0; j <11 ; j++) {  
+     for (var k = 0; k < 5; k++) {  
+         wins[i + k][j + k][count] = true;  
+     }  
+     count++;  
+ }  
+}  
+//所有反斜线赢法 \
+for (var i = 0; i < 11; i++) {  
+ for (var j = 14; j > 3; j--) {  
+     for (var k = 0; k < 5; k++) {  
+         wins[i + k][j - k][count] = true;  
+     }  
+     count++;  
+ }  
+}
+
 //画棋盘
 function  drawBoard(w,r){
 	ctx.beginPath();  
@@ -60,7 +108,7 @@ function onestep(i, j, me) {
     ctx.fill();  
     ctx.closePath();  
 }  
-
+//玩家落子
 chess.onclick = function(e){
 	var x = e.offsetX;
 	var y = e.offsetY;
