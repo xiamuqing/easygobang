@@ -20,14 +20,16 @@ var haveChess = false;
 //是否点击了开始按钮
 var startBtn = false;
 //是否点击了悔棋按钮
+var retrBtn = false;
+//是否点击了撤销悔棋按钮
 var backBtn = false;
 //保存点击悔棋按钮之前赢法统计数组(computerWin,myWin)的值
-var cWinValue, myWinValue;
+var cWinValue = -1, myWinValue = -1;
 
 //悔棋时黑子下棋坐标
-var bx = 0, by = 0;
+var bx=-1 , by =-1;
 //悔棋时白棋下棋坐标
-var wx = 0, wy = 0;
+var wx=-1 , wy=-1 ;
 
 //存储棋盘落子情况
 //0:无子 1:黑棋 2:白棋
@@ -57,6 +59,11 @@ function newGame(){
     startClick = false;
     gameStart = true;
     count = 0;
+    haveChess = false;
+    bx = -1;
+    by = -1;
+    wx = -1;
+    wy = -1 ;
     //初始化chessBoard、wins数组,wins[][]棋盘坐标
     for(var i= 0; i<15;i++){
         chessBoard[i]=[];
@@ -169,28 +176,37 @@ function myClick(e){
         chessBoard[i][j] = 1;
         bx = i;
         by = j;
-        backBtn = false;
+        if(retrBtn && backBtn){
+            backBtn = false;
+            retrBtn = false;
+        }
         for(var k =0 ;k<count;k++){
             if(wins[i][j][k]){
                 myWin[k]++;
+                cWinValue = computerWin[k];
                 computerWin[k] = -1;
                 if(myWin[k] ==5){
                     over = true;
                     setTimeout(function () {
-                        gameOver();
+                        gameOver(me);
                     }, 100)
                 }
             }
         }
         if(!over){
             me = !me;
-            setTimeout(computerAI, 100);
+            setTimeout(function(){
+                computerAI(wx,wy);
+            }, 200);
         }
     }
 }
 
 //计算机AI
-function computerAI(){
+function computerAI(wx,wy){
+    // if(wx&&wy){
+    //     oneStep(wx,wy,0);
+    // }
     var myScore =[];
     var computerScore =[];
     //保存最高分数
@@ -248,7 +264,7 @@ function computerAI(){
                     u = i;
                     v = j;
                 } else if (computerScore[i][j] == max) {
-                    if (computerScore[i][j] > myScore[u][v]) {
+                    if (myScore[i][j] > myScore[u][v]) {
                         u = i;
                         v = j;
                     }
@@ -256,13 +272,15 @@ function computerAI(){
             }
         }
     }
+    // heightLight(u,v);
     oneStep(u,v,0);
     chessBoard[u][v] =2;
-    wx = u;
-    wy = v;
+    window.wx = u;
+    window.wy = v;
     for(var k =0 ;k<count;k++){
         if(wins[u][v][k]){
             computerWin[k]++;
+            myWinValue = myWin[k];
             myWin[k] = -1;
             if(computerWin[k] ==5){
                 over = true;
@@ -306,7 +324,10 @@ start.onclick = function () {
 }
 //点击悔棋按钮
 retract.onclick = function () {
-    backBtn = true;
+    if(!haveChess){
+        return;
+    }
+    retrBtn = true;
     chessBoard[bx][by] = 0;
     chessBoard[wx][wy] = 0;
     //擦除棋子
@@ -339,11 +360,11 @@ retract.onclick = function () {
 
 //撤销悔棋
 backout.onclick = function () {
-    if (backBtn) {
+    if (retrBtn) {
         chessBoard[bx][by] = 2;
         chessBoard[wx][wy] = 1;
-        oneStep(bx, by, true);
-        oneStep(wx, wy, false);
+        oneStep(bx, by, 1);
+        oneStep(wx, wy, 0);
         for (var k = 0; k < count; k++) {
             if (wins[bx][by][k]) {
                 myWin[k]++;
@@ -354,5 +375,18 @@ backout.onclick = function () {
                 myWin[k] = -1;
             }
         }
+        backBtn = true;
     }
+}
+
+//给最新下子的黑棋加光环
+function heightLight(i,j){
+    ctx.beginPath();  
+    ctx.arc(20 + i * 2*20, 15 + j * 2*20, 15, 0, 2 * Math.PI);  
+    var gradient = ctx.createRadialGradient(20 + i * 2*20 + 2, 20 + j * 2*20 - 2, 15, 20 + i * 2*20 + 2, 15 + j * 2*20 - 2, 0.2);   
+    gradient.addColorStop(0, "#E8E8E8");  
+    gradient.addColorStop(1, "#F9F9F9");    
+    ctx.fillStyle = gradient;  
+    ctx.fill();  
+    ctx.closePath();  
 }

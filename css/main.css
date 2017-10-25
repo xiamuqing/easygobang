@@ -8,7 +8,7 @@
 	display: inline-block;
 	float: left;
 }
-canvas{
+#chess{
 	margin-top: 20px;
 	margin-left: 10%;
 	background-color: #E1C19E;
@@ -27,6 +27,7 @@ canvas{
 }
 
 #opt button{
+	font-size:18px;
 	width: 150px;
 	flex: 1;
 	margin: 20px auto;
