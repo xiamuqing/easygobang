@@ -1,25 +1,35 @@
-body{
-	text-align: center;
+#gobang{
+	width: 100%;
 }
 
+#father{
+	width: 70%;
+	text-align: center;
+	display: inline-block;
+	float: left;
+}
 canvas{
 	margin-top: 20px;
+	margin-left: 10%;
 	background-color: #E1C19E;
 	box-shadow:-2px -2px 2px #EFEFEF,5px 5px 5px #B9B9B9;  
 }
 
+#optfather{
+	width: 20%;
+	float: right;
+	transform: translate(-40%, 150px);
+}
 #opt{
 	display: flex;
 	flex-direction: column;
 	height: 300px;
-	width: 150px;
-	float: right;
-	transform: translate(-200px, 150px);
 }
 
 #opt button{
+	width: 150px;
 	flex: 1;
-	margin: 20px 0;
+	margin: 20px auto;
 	border-radius: 4px;
 	border: 1px solid #ccc;
 	color: #fff;

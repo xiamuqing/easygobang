@@ -1,3 +1,4 @@
+var father = document.getElementById('father');  
 var start = document.getElementById('start');  
 var retract = document.getElementById('retract');  
 var backout = document.getElementById('backout');  
@@ -7,7 +8,7 @@ var chess = document.createElement( 'canvas' );
 chess.id="chess";
 chess.width = 600;
 chess.height = 600;
-document.body.appendChild( chess );
+father.appendChild( chess );
 var ctx = chess.getContext('2d');  
 
 //me:true:黑棋(玩家) false:白棋
@@ -47,8 +48,8 @@ window.onload = function () {
 };
 
 function newGame(){
-	//擦除画布
-	ctx.clearRect(0, 0, chess.width, chess.height);
+    //擦除画布
+    ctx.clearRect(0, 0, chess.width, chess.height);
     drawBoard(600,20);
     //初始化变量
     me = true;
@@ -57,72 +58,72 @@ function newGame(){
     gameStart = true;
     count = 0;
     //初始化chessBoard、wins数组,wins[][]棋盘坐标
-	for(var i= 0; i<15;i++){
-		chessBoard[i]=[];
-		wins[i] =[];
-		for(var j = 0;j<15;j++){
-			chessBoard[i][j] =0;
-			wins[i][j]=[];
-		}
-	}
-	//所有竖线赢法|
-	for (var i = 0; i < 15; i++) {  
-	 for (var j = 0; j < 11; j++) {  
-	     for (var k = 0; k < 5; k++) {  
-	         wins[i][j + k][count] = true;  
-	     }  
-	     count++;  
-	 }  
-	}  
-	//所有横线线赢法-
-	for (var i = 0; i < 15; i++) {  
-	 for (var j = 0; j < 11; j++) {  
-	     for (var k = 0; k < 5; k++) {  
-	         wins[j + k][i][count] = true;  
-	     }  
-	     count++;  
-	 }  
-	}  
-	//所有斜线赢法 /
-	for (var i = 0; i < 11; i++) {  
-	 for (var j = 0; j <11 ; j++) {  
-	     for (var k = 0; k < 5; k++) {  
-	         wins[i + k][j + k][count] = true;  
-	     }  
-	     count++;  
-	 }  
-	}  
-	//所有反斜线赢法 \
-	for (var i = 0; i < 11; i++) {  
-	 for (var j = 14; j > 3; j--) {  
-	     for (var k = 0; k < 5; k++) {  
-	         wins[i + k][j - k][count] = true;  
-	     }  
-	     count++;  
-	 }  
-	}
-	//初始化黑白棋落子赢法
-	for(var i = 0;i<count;i++){
-		myWin[i]=0;
-		computerWin[i] =0;
-	}
+    for(var i= 0; i<15;i++){
+        chessBoard[i]=[];
+        wins[i] =[];
+        for(var j = 0;j<15;j++){
+            chessBoard[i][j] =0;
+            wins[i][j]=[];
+        }
+    }
+    //所有竖线赢法|
+    for (var i = 0; i < 15; i++) {  
+     for (var j = 0; j < 11; j++) {  
+         for (var k = 0; k < 5; k++) {  
+             wins[i][j + k][count] = true;  
+         }  
+         count++;  
+     }  
+    }  
+    //所有横线线赢法-
+    for (var i = 0; i < 15; i++) {  
+     for (var j = 0; j < 11; j++) {  
+         for (var k = 0; k < 5; k++) {  
+             wins[j + k][i][count] = true;  
+         }  
+         count++;  
+     }  
+    }  
+    //所有斜线赢法 /
+    for (var i = 0; i < 11; i++) {  
+     for (var j = 0; j <11 ; j++) {  
+         for (var k = 0; k < 5; k++) {  
+             wins[i + k][j + k][count] = true;  
+         }  
+         count++;  
+     }  
+    }  
+    //所有反斜线赢法 \
+    for (var i = 0; i < 11; i++) {  
+     for (var j = 14; j > 3; j--) {  
+         for (var k = 0; k < 5; k++) {  
+             wins[i + k][j - k][count] = true;  
+         }  
+         count++;  
+     }  
+    }
+    //初始化黑白棋落子赢法
+    for(var i = 0;i<count;i++){
+        myWin[i]=0;
+        computerWin[i] =0;
+    }
 
 }
 
 //画棋盘
 function  drawBoard(w,r){
-	ctx.beginPath();  
-	for (var i = 0; i < 15; i++) {  
-		//横线
-		ctx.moveTo(r, r + i * 2*r);  
-		ctx.lineTo(w-r, r + i * 2*r); 
-		//竖线 
-		ctx.moveTo(r + i * 2*r, r);  
-		ctx.lineTo(r + i * 2*r, w-r);  
-	}  
-	ctx.stroke();  
-	// ctx.strokeStyle = "#ccc";
-	ctx.closePath();
+    ctx.beginPath();  
+    for (var i = 0; i < 15; i++) {  
+        //横线
+        ctx.moveTo(r, r + i * 2*r);  
+        ctx.lineTo(w-r, r + i * 2*r); 
+        //竖线 
+        ctx.moveTo(r + i * 2*r, r);  
+        ctx.lineTo(r + i * 2*r, w-r);  
+    }  
+    ctx.stroke();  
+    // ctx.strokeStyle = "#ccc";
+    ctx.closePath();
 }
 
 //画棋子
@@ -148,64 +149,64 @@ chess.onclick = function (e) {
 }
 //落子
 function myClick(e){
-	if (startBtn) {
+    if (startBtn) {
         haveChess = true;
     } else if (!startBtn && !haveChess) {
         return;
     }
-	if(over){
-		return;
-	}
-	if(!me){
-		return;
-	}
-	var x = e.offsetX;
-	var y = e.offsetY;
-	i = Math.floor(x / (2*20));  
+    if(over){
+        return;
+    }
+    if(!me){
+        return;
+    }
+    var x = e.offsetX;
+    var y = e.offsetY;
+    i = Math.floor(x / (2*20));  
     j = Math.floor(y / (2*20)); 
     if(chessBoard[i][j] == 0){
-	    oneStep(i, j, me); 
-    	chessBoard[i][j] = 1;
-    	bx = i;
+        oneStep(i, j, me); 
+        chessBoard[i][j] = 1;
+        bx = i;
         by = j;
         backBtn = false;
-    	for(var k =0 ;k<count;k++){
-    		if(wins[i][j][k]){
-    			myWin[k]++;
-    			computerWin[k] = -1;
-    			if(myWin[k] ==5){
-    				over = true;
-    				setTimeout(function () {
-                   		gameOver();
-                	}, 100)
-    			}
-    		}
-    	}
-    	if(!over){
-    		me = !me;
-    		setTimeout(computerAI, 100);
-    	}
+        for(var k =0 ;k<count;k++){
+            if(wins[i][j][k]){
+                myWin[k]++;
+                computerWin[k] = -1;
+                if(myWin[k] ==5){
+                    over = true;
+                    setTimeout(function () {
+                        gameOver();
+                    }, 100)
+                }
+            }
+        }
+        if(!over){
+            me = !me;
+            setTimeout(computerAI, 100);
+        }
     }
 }
 
 //计算机AI
 function computerAI(){
-	var myScore =[];
-	var computerScore =[];
-	//保存最高分数
+    var myScore =[];
+    var computerScore =[];
+    //保存最高分数
     var max = 0;
     //最高分数坐标
     var u = 0, v = 0;
     //初始化数组
-	for(var i = 0; i<15;i++){
-		myScore[i]=[];
-		computerScore[i]=[];
-		for(var j = 0;j<15;j++){
-			myScore[i][j]=0;
-			computerScore[i][j]=0;
-		}
-	}
-	for (var i = 0; i < 15; i++) {
+    for(var i = 0; i<15;i++){
+        myScore[i]=[];
+        computerScore[i]=[];
+        for(var j = 0;j<15;j++){
+            myScore[i][j]=0;
+            computerScore[i][j]=0;
+        }
+    }
+    for (var i = 0; i < 15; i++) {
         for (var j = 0; j < 15; j++) {
             if (chessBoard[i][j] == 0) {
                 for (var k = 0; k < count; k++) {
@@ -260,20 +261,20 @@ function computerAI(){
     wx = u;
     wy = v;
     for(var k =0 ;k<count;k++){
-		if(wins[u][v][k]){
-			computerWin[k]++;
-			myWin[k] = -1;
-			if(computerWin[k] ==5){
-    			over = true;
-				setTimeout(function () {
+        if(wins[u][v][k]){
+            computerWin[k]++;
+            myWin[k] = -1;
+            if(computerWin[k] ==5){
+                over = true;
+                setTimeout(function () {
                     gameOver();
                 }, 100)
-			}
-		}
-	}
-	if(!over){
-		me =!me;
-	}
+            }
+        }
+    }
+    if(!over){
+        me =!me;
+    }
 }
 
 //结束函数
