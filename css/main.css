@@ -1,0 +1,54 @@
+body{
+	text-align: center;
+}
+
+canvas{
+	margin-top: 20px;
+	background-color: #ddb87e;
+	box-shadow:-2px -2px 2px #EFEFEF,5px 5px 5px #B9B9B9;  
+}
+
+#opt{
+	display: flex;
+	flex-direction: column;
+	height: 300px;
+	width: 150px;
+	float: right;
+	transform: translate(-200px, 150px);
+}
+
+#opt button{
+	flex: 1;
+	margin: 20px 0;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	color: #fff;
+	cursor: pointer;
+	 /*清除点击时蓝色的边框  */
+	outline:0;
+	box-shadow:-3px -3px 1px #EFEFEF,2px 2px 1px #B9B9B9;  
+}
+button:nth-child(1){
+	background-color: #449d44;
+	border-color: #398439;
+}
+button:nth-child(1):hover{
+	background-color: #5cb85c;
+	border-color: #4cae4c;
+}
+button:nth-child(2){
+	background-color: #c9302c;
+	border-color: #ac2925;
+}
+button:nth-child(2):hover{
+	background-color: #d9534f;
+	border-color: #d43f3a;
+}
+button:nth-child(3){
+	background-color: #ec971f;
+	border-color: #d58512;
+}
+button:nth-child(3):hover{
+	background-color: #f0ad4e;
+	border-color: #eea236;
+}
