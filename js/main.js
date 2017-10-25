@@ -12,12 +12,17 @@ var ctx = chess.getContext('2d');
 
 //判断是玩家还是电脑
 var me = true;
+var over = false;
 //存储棋盘落子情况
 //0:无子 1:黑棋 2:白棋
 var chessBoard = [];
 
 //存储所有赢法
 var wins =[];
+
+//赢法统计数组
+var mywin =[];
+var computerwin =[];
 
 //赢法个数
 var count = 0;
@@ -72,6 +77,13 @@ for (var i = 0; i < 11; i++) {
  }  
 }
 
+for(var i = 0;i<count;i++){
+	mywin[i]=0;
+	computerwin[i] =0;
+}
+
+
+
 //画棋盘
 function  drawBoard(w,r){
 	ctx.beginPath();  
@@ -87,9 +99,6 @@ function  drawBoard(w,r){
 	ctx.strokeStyle = "#ccc";
 	ctx.closePath();
 }
-
-// onestep(0, 0, 1);
-// onestep(1, 1, 0);
 
 //画棋子
 function onestep(i, j, me) {  
@@ -110,6 +119,9 @@ function onestep(i, j, me) {
 }  
 //玩家落子
 chess.onclick = function(e){
+	if(over){
+		return;
+	}
 	var x = e.offsetX;
 	var y = e.offsetY;
 	i = Math.floor(x / (2*20));  
@@ -122,5 +134,15 @@ chess.onclick = function(e){
     		chessBoard[i][j] = 2;
     	}
     	me = !me;
+    	for(var k =0 ;k<count;k++){
+    		if(wins[i][j][k]){
+    			mywin[k]++;
+    			computerwin[k] = -1;
+    			if(mywin[k] ==5){
+    				window.alert('你赢了！');
+    				over = true;
+    			}
+    		}
+    	}
     }
 }
