@@ -213,9 +213,9 @@ function myClick(e){
 
 //计算机AI
 function computerAI(wx,wy,isDraw){
-    // if(wx&&wy){
-    //     oneStep(wx,wy,0);
-    // }
+    if(wx&&wy){
+        oneStep(wx,wy,0);
+    }
     myScore =[];
     computerScore =[];
     //保存最高分数
@@ -282,9 +282,10 @@ function computerAI(wx,wy,isDraw){
             }
         }
     }
-    // heightLight(u,v);
+    
     if(isDraw){
-        oneStep(u,v,0);
+        heightLight(u,v);
+        // oneStep(u,v,0);
         chessBoard[u][v] =2;
         window.wx = u;
         window.wy = v;
@@ -376,7 +377,7 @@ backout.onclick = function () {
         chessBoard[bx][by] = 2;
         chessBoard[wx][wy] = 1;
         oneStep(bx, by, 1);
-        oneStep(wx, wy, 0);
+        heightLight(wx,wy);
         myWin = oldmyWinValue.concat();
         computerWin= oldcWinValue.concat();
         computerAI();
