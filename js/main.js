@@ -17,8 +17,6 @@ var over = false;
 
 //棋盘上是否有子
 var haveChess = false;
-//是否点击了开始按钮
-var startBtn = false;
 //是否点击了悔棋按钮
 var retrBtn = false;
 //是否点击了撤销悔棋按钮
@@ -51,7 +49,7 @@ var computerScore =[];
 var count = 0;
 
 window.onload = function () {
-    drawBoard(600,20);
+    newGame()
 };
 
 function newGame(){
@@ -61,7 +59,7 @@ function newGame(){
     //初始化变量
     me = true;
     over = false;
-    startClick = false;
+    // startClick = false;
     gameStart = true;
     count = 0;
     haveChess = false;
@@ -145,7 +143,7 @@ function oneStep(i, j, me) {
         gradient.addColorStop(1, "#636766");  
     }  
     else {  
-        gradient.addColorStop(0, "#D1D1D1");  
+        gradient.addColorStop(0, "#c8c8c8");  
         gradient.addColorStop(1, "#F9F9F9");  
     }  
     ctx.fillStyle = gradient;  
@@ -158,11 +156,7 @@ chess.onclick = function (e) {
 }
 //落子
 function myClick(e){
-    if (startBtn) {
-        haveChess = true;
-    } else if (!startBtn && !haveChess) {
-        return;
-    }
+    haveChess = true;
     if(over){
         return;
     }
@@ -214,6 +208,7 @@ function myClick(e){
 //计算机AI
 function computerAI(wx,wy,isDraw){
     if(wx&&wy){
+        //判断是新棋子还是老棋子
         oneStep(wx,wy,0);
     }
     myScore =[];
@@ -285,7 +280,6 @@ function computerAI(wx,wy,isDraw){
     
     if(isDraw){
         heightLight(u,v);
-        // oneStep(u,v,0);
         chessBoard[u][v] =2;
         window.wx = u;
         window.wy = v;
@@ -321,19 +315,14 @@ function gameOver(me) {
     }
 }
 
-//点击开始按钮
+//点击重新开始按钮
 start.onclick = function () {
-    startBtn = true;
-    if (haveChess && startBtn) {
+    if (haveChess) {
         if (window.confirm('是否重新开始游戏？')) {
             newGame();
             haveChess = false;
         }
-    } else {
-        newGame();
-        haveChess = false;
-    }
-
+    } 
 }
 //点击悔棋按钮
 retract.onclick = function () {
@@ -390,8 +379,8 @@ function heightLight(i,j){
     ctx.beginPath();  
     ctx.arc(20 + i * 2*20, 15 + j * 2*20, 15, 0, 2 * Math.PI);  
     var gradient = ctx.createRadialGradient(20 + i * 2*20 + 2, 20 + j * 2*20 - 2, 15, 20 + i * 2*20 + 2, 15 + j * 2*20 - 2, 0.2);   
-    gradient.addColorStop(0, "#E8E8E8");  
-    gradient.addColorStop(1, "#F9F9F9");    
+    gradient.addColorStop(0, "#e2e2e2");  
+    gradient.addColorStop(1, "#F9F9F9");  
     ctx.fillStyle = gradient;  
     ctx.fill();  
     ctx.closePath();  

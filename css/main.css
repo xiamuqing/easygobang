@@ -27,7 +27,7 @@
 }
 
 #opt button{
-	font-size:18px;
+	font-size:19px;
 	width: 150px;
 	flex: 1;
 	margin: 20px auto;
@@ -37,7 +37,7 @@
 	cursor: pointer;
 	 /*清除点击时蓝色的边框  */
 	outline:0;
-	box-shadow:-3px -3px 1px #EFEFEF,2px 2px 1px #B9B9B9;  
+	/* box-shadow:-3px -3px 1px #EFEFEF,2px 2px 1px #B9B9B9;   */
 }
 button:nth-child(1){
 	background-color: #449d44;
