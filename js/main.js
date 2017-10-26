@@ -24,7 +24,9 @@ var retrBtn = false;
 //是否点击了撤销悔棋按钮
 var backBtn = false;
 //保存点击悔棋按钮之前赢法统计数组(computerWin,myWin)的值
-var cWinValue = -1, myWinValue = -1;
+var cWinValue = [], myWinValue = [];
+//保存点击撤销悔棋按钮之前赢法统计数组(computerWin,myWin)的值
+var oldcWinValue = [], oldmyWinValue = [];
 
 //悔棋时黑子下棋坐标
 var bx=-1 , by =-1;
@@ -41,6 +43,9 @@ var wins =[];
 //赢法统计数组
 var myWin =[];
 var computerWin =[];
+
+var myScore =[];
+var computerScore =[];
 
 //赢法个数
 var count = 0;
@@ -60,10 +65,7 @@ function newGame(){
     gameStart = true;
     count = 0;
     haveChess = false;
-    bx = -1;
-    by = -1;
-    wx = -1;
-    wy = -1 ;
+    bx = -1,by = -1,wx = -1,wy = -1 ;
     //初始化chessBoard、wins数组,wins[][]棋盘坐标
     for(var i= 0; i<15;i++){
         chessBoard[i]=[];
@@ -180,35 +182,42 @@ function myClick(e){
             backBtn = false;
             retrBtn = false;
         }
+        //为悔棋功能保存最后落子的前一次落子的赢法数组
+        //concat()深拷贝
+        myWinValue = myWin.concat();
+        cWinValue = computerWin.concat();
         for(var k =0 ;k<count;k++){
             if(wins[i][j][k]){
                 myWin[k]++;
-                cWinValue = computerWin[k];
                 computerWin[k] = -1;
                 if(myWin[k] ==5){
                     over = true;
                     setTimeout(function () {
                         gameOver(me);
+                        return;
                     }, 100)
                 }
             }
         }
+        //为撤销悔棋功能保存最后一次落子的赢法数组
+        oldmyWinValue = myWin.concat();
+        oldcWinValue = computerWin.concat();
         if(!over){
             me = !me;
             setTimeout(function(){
-                computerAI(wx,wy);
+                computerAI(wx,wy,true);
             }, 200);
         }
     }
 }
 
 //计算机AI
-function computerAI(wx,wy){
+function computerAI(wx,wy,isDraw){
     // if(wx&&wy){
     //     oneStep(wx,wy,0);
     // }
-    var myScore =[];
-    var computerScore =[];
+    myScore =[];
+    computerScore =[];
     //保存最高分数
     var max = 0;
     //最高分数坐标
@@ -222,6 +231,7 @@ function computerAI(wx,wy){
             computerScore[i][j]=0;
         }
     }
+    //遍历棋盘
     for (var i = 0; i < 15; i++) {
         for (var j = 0; j < 15; j++) {
             if (chessBoard[i][j] == 0) {
@@ -231,7 +241,7 @@ function computerAI(wx,wy){
                             //第K种赢法 黑棋(玩家)落了第一颗子
                             myScore[i][j] += 200;
                         } else if (myWin[k] == 2) {
-                            myScore[i][j] += 400;
+                            myScore[i][j] += 1000;
                         } else if (myWin[k] == 3) {
                             myScore[i][j] += 2000;
                         } else if (myWin[k] == 4) {
@@ -241,9 +251,9 @@ function computerAI(wx,wy){
                             //第K种赢法 白棋(电脑)落了第一颗子
                             computerScore[i][j] += 200;
                         } else if (computerWin[k] == 2) {
-                            computerScore[i][j] += 420;
+                            computerScore[i][j] += 1200;
                         } else if (computerWin[k] == 3) {
-                            computerScore[i][j] += 2100;
+                            computerScore[i][j] += 2400;
                         } else if (computerWin[k] == 4) {
                             computerScore[i][j] += 20000;
                         }
@@ -273,25 +283,27 @@ function computerAI(wx,wy){
         }
     }
     // heightLight(u,v);
-    oneStep(u,v,0);
-    chessBoard[u][v] =2;
-    window.wx = u;
-    window.wy = v;
-    for(var k =0 ;k<count;k++){
-        if(wins[u][v][k]){
-            computerWin[k]++;
-            myWinValue = myWin[k];
-            myWin[k] = -1;
-            if(computerWin[k] ==5){
-                over = true;
-                setTimeout(function () {
-                    gameOver();
-                }, 100)
+    if(isDraw){
+        oneStep(u,v,0);
+        chessBoard[u][v] =2;
+        window.wx = u;
+        window.wy = v;
+        for(var k =0 ;k<count;k++){
+            if(wins[u][v][k]){
+                computerWin[k]++;
+                myWinValue[k] = myWin[k];
+                myWin[k] = -1;
+                if(computerWin[k] ==5){
+                    over = true;
+                    setTimeout(function () {
+                        gameOver();
+                    }, 100)
+                }
             }
         }
-    }
-    if(!over){
-        me =!me;
+        if(!over){
+            me =!me;
+        }
     }
 }
 
@@ -346,16 +358,16 @@ retract.onclick = function () {
     ctx.stroke();
     ctx.closePath();
     //减去悔棋位置的赢法
-    for (var k = 0; k < count; k++) {
-        if (wins[bx][by][k]) {
-            myWin[k]--;
-            computerWin[k] = cWinValue;
+    myWin= myWinValue.concat();
+    computerWin= cWinValue.concat();
+     for(var k =0 ;k<count;k++){
+            if(wins[bx][by][k]){
+                if(myWin[k] ==4){
+                    myWin[k]--;
+                }
+            }
         }
-        if (wins[wx][wy][k]) {
-            computerWin[k]--;
-            myWin[k] = myWinValue;
-        }
-    }
+    computerAI();
 }
 
 //撤销悔棋
@@ -365,16 +377,9 @@ backout.onclick = function () {
         chessBoard[wx][wy] = 1;
         oneStep(bx, by, 1);
         oneStep(wx, wy, 0);
-        for (var k = 0; k < count; k++) {
-            if (wins[bx][by][k]) {
-                myWin[k]++;
-                computerWin[k] = -1;
-            }
-            if (wins[wx][wy][k]) {
-                computerWin[k]++;
-                myWin[k] = -1;
-            }
-        }
+        myWin = oldmyWinValue.concat();
+        computerWin= oldcWinValue.concat();
+        computerAI();
         backBtn = true;
     }
 }
