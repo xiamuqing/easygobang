@@ -1,11 +1,11 @@
-var father = document.getElementById('father');  
-var start = document.getElementById('start');  
-var retract = document.getElementById('retract');  
-var backout = document.getElementById('backout');  
+var father = document.getElementById('gb-father');  
+var start = document.getElementById('gb-start');  
+var retract = document.getElementById('gb-retract');  
+var backout = document.getElementById('gb-backout');  
 
 //新建画布
 var chess = document.createElement( 'canvas' );
-chess.id="chess";
+chess.id="gb-chess";
 chess.width = 600;
 chess.height = 600;
 father.appendChild( chess );
@@ -173,6 +173,7 @@ function myClick(e){
         bx = i;
         by = j;
         if(retrBtn){
+            //防止点悔棋后再次下子时撤销的老棋子被画出来 
             wx= -1,wy =-1;
         }
         backBtn = false;

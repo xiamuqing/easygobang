@@ -2,31 +2,31 @@
 	width: 100%;
 }
 
-#father{
+#gb-father{
 	width: 70%;
 	text-align: center;
 	display: inline-block;
 	float: left;
 }
-#chess{
+#gb-chess{
 	margin-top: 20px;
 	margin-left: 10%;
 	background-color: #E1C19E;
 	box-shadow:-2px -2px 2px #EFEFEF,5px 5px 5px #B9B9B9;  
 }
 
-#optfather{
+#gb-opt-father{
 	width: 20%;
 	float: right;
 	transform: translate(-40%, 150px);
 }
-#opt{
+#gb-opt{
 	display: flex;
 	flex-direction: column;
 	height: 300px;
 }
 
-#opt button{
+#gb-opt button{
 	font-size:19px;
 	width: 150px;
 	flex: 1;
@@ -39,27 +39,27 @@
 	outline:0;
 	/* box-shadow:-3px -3px 1px #EFEFEF,2px 2px 1px #B9B9B9;   */
 }
-button:nth-child(1){
+#gb-opt button:nth-child(1){
 	background-color: #449d44;
 	border-color: #398439;
 }
-button:nth-child(1):hover{
+#gb-opt button:nth-child(1):hover{
 	background-color: #5cb85c;
 	border-color: #4cae4c;
 }
-button:nth-child(2){
+#gb-opt button:nth-child(2){
 	background-color: #c9302c;
 	border-color: #ac2925;
 }
-button:nth-child(2):hover{
+#gb-opt button:nth-child(2):hover{
 	background-color: #d9534f;
 	border-color: #d43f3a;
 }
-button:nth-child(3){
+#gb-opt button:nth-child(3){
 	background-color: #ec971f;
 	border-color: #d58512;
 }
-button:nth-child(3):hover{
+#gb-opt button:nth-child(3):hover{
 	background-color: #f0ad4e;
 	border-color: #eea236;
 }
