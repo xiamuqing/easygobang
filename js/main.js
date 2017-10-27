@@ -172,10 +172,12 @@ function myClick(e){
         chessBoard[i][j] = 1;
         bx = i;
         by = j;
-        if(retrBtn){
-            //防止点悔棋后再次下子时撤销的老棋子被画出来 
+        if(retrBtn&&!backBtn){
+            //retrBtn:防止点悔棋后，再下子时撤销的老棋子被画出来 
+            //backBtn:防止点击撤销悔棋，再下棋时高亮的棋子一直高亮
             wx= -1,wy =-1;
         }
+        
         backBtn = false;
         retrBtn = false;
         //为悔棋功能保存最后落子的前一次落子的赢法数组
