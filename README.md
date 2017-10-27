@@ -2,11 +2,6 @@
 
 在这个游戏里，玩家默认是黑棋先手，以后会逐步改进玩家可以选择棋子。
 
-基本算法教程：http://www.imooc.com/learn/644
-## 人机对战五子棋
-
-在这个游戏里，玩家默认是黑棋先手，以后会逐步改进玩家可以选择棋子。
-
 游戏地址：https://xiamuqing.github.io/easygobang/
 
 基本算法教程：http://www.imooc.com/learn/644
