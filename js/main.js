@@ -22,9 +22,9 @@ var retrBtn = false;
 //是否点击了撤销悔棋按钮
 var backBtn = false;
 //保存点击悔棋按钮之前赢法统计数组(computerWin,myWin)的值
-var cWinValue = [], myWinValue = [];
+var oldcWin = [], oldmyWin = [];
 //保存点击撤销悔棋按钮之前赢法统计数组(computerWin,myWin)的值
-var oldcWinValue = [], oldmyWinValue = [];
+var newcWin = [], newmyWin = [];
 
 //悔棋时黑子下棋坐标
 var bx=-1 , by =-1;
@@ -172,14 +172,15 @@ function myClick(e){
         chessBoard[i][j] = 1;
         bx = i;
         by = j;
-        if(retrBtn && backBtn){
-            backBtn = false;
-            retrBtn = false;
+        if(retrBtn){
+            wx= -1,wy =-1;
         }
+        backBtn = false;
+        retrBtn = false;
         //为悔棋功能保存最后落子的前一次落子的赢法数组
         //concat()深拷贝
-        myWinValue = myWin.concat();
-        cWinValue = computerWin.concat();
+        oldmyWin = myWin.concat();
+        oldcWin = computerWin.concat();
         for(var k =0 ;k<count;k++){
             if(wins[i][j][k]){
                 myWin[k]++;
@@ -194,8 +195,8 @@ function myClick(e){
             }
         }
         //为撤销悔棋功能保存最后一次落子的赢法数组
-        oldmyWinValue = myWin.concat();
-        oldcWinValue = computerWin.concat();
+        newmyWin = myWin.concat();
+        newcWin = computerWin.concat();
         if(!over){
             me = !me;
             setTimeout(function(){
@@ -207,8 +208,7 @@ function myClick(e){
 
 //计算机AI
 function computerAI(wx,wy,isDraw){
-    if(wx&&wy){
-        //判断是新棋子还是老棋子
+    if(!retrBtn){
         oneStep(wx,wy,0);
     }
     myScore =[];
@@ -286,7 +286,7 @@ function computerAI(wx,wy,isDraw){
         for(var k =0 ;k<count;k++){
             if(wins[u][v][k]){
                 computerWin[k]++;
-                myWinValue[k] = myWin[k];
+                oldmyWin[k] = myWin[k];
                 myWin[k] = -1;
                 if(computerWin[k] ==5){
                     over = true;
@@ -348,8 +348,8 @@ retract.onclick = function () {
     ctx.stroke();
     ctx.closePath();
     //减去悔棋位置的赢法
-    myWin= myWinValue.concat();
-    computerWin= cWinValue.concat();
+    myWin= oldmyWin.concat();
+    computerWin= oldcWin.concat();
      for(var k =0 ;k<count;k++){
             if(wins[bx][by][k]){
                 if(myWin[k] ==4){
@@ -357,6 +357,7 @@ retract.onclick = function () {
                 }
             }
         }
+
     computerAI();
 }
 
@@ -367,8 +368,8 @@ backout.onclick = function () {
         chessBoard[wx][wy] = 1;
         oneStep(bx, by, 1);
         heightLight(wx,wy);
-        myWin = oldmyWinValue.concat();
-        computerWin= oldcWinValue.concat();
+        myWin = newmyWin.concat();
+        computerWin= newcWin.concat();
         computerAI();
         backBtn = true;
     }
