@@ -5,17 +5,15 @@
 	<title>五子棋</title>
 	<link rel="stylesheet" href="css/main.css">
 </head>
-<body>
-	<div id="gobang">
-		<div id="gb-father"></div>
-		<div id="gb-opt-father">
-			<div id="gb-opt">
-				<button id="gb-start">重新开始</button>
-				<button id="gb-retract">悔    棋</button>
-				<button id="gb-backout">撤销悔棋</button>
-			</div>
-		</div>
-	</div>
+<body id="gobangBox">
 	<script src="js/main.js"></script>
+	<script>
+		var gbObj={
+			parentID:'gobangBox',
+			width:600,
+			radius:20
+		}
+		var goBang = new GoBang(gbObj);
+	</script>
 </body>
 </html>

@@ -1,391 +1,422 @@
-var father = document.getElementById('gb-father');  
-var start = document.getElementById('gb-start');  
-var retract = document.getElementById('gb-retract');  
-var backout = document.getElementById('gb-backout');  
+function GoBang(obj){
+   var parent = document.getElementById(obj.parentID);
+   var width = obj.width;
+   var radius = obj.radius;
+   this.init(parent , width,radius);
+}
+GoBang.prototype = {
+    constructor:GoBang,
+    init:function(parent , width,radius){
+        this.initElements(parent,width);
+        this.newGame(width,radius);
+        this.bindEvents(radius,width);
+    },
+    //给页面插入元素
+    initElements:function(parent,width){
+        var html ='<div id="gobang">'+
+            '<div id="gb-father"></div>'+
+            '<div id="gb-opt-father">'+
+                '<div id="gb-opt">'+
+                    '<button id="gb-start">重新开始</button>'+
+                    '<button id="gb-retract">悔    棋</button>'+
+                    '<button id="gb-backout">撤销悔棋</button>'+
+                '</div>'+
+            '</div>'+
+        '</div>';
+        parent.innerHTML=html;
+        this.father = document.getElementById('gb-father');  
+        this.start = document.getElementById('gb-start');  
+        this.retract = document.getElementById('gb-retract');  
+        this.backout = document.getElementById('gb-backout');
+        this.chess = document.createElement( 'canvas' );
+        this.chess.id="gb-chess";
+        this.chess.width = width;
+        this.chess.height = width;
+        this.father.appendChild( this.chess );
+        this.ctx = this.chess.getContext('2d');  
 
-//新建画布
-var chess = document.createElement( 'canvas' );
-chess.id="gb-chess";
-chess.width = 600;
-chess.height = 600;
-father.appendChild( chess );
-var ctx = chess.getContext('2d');  
-
-//me:true:黑棋(玩家) false:白棋
-var me = true;
-var over = false;
-
-//棋盘上是否有子
-var haveChess = false;
-//是否点击了悔棋按钮
-var retrBtn = false;
-//是否点击了撤销悔棋按钮
-var backBtn = false;
-//保存点击悔棋按钮之前赢法统计数组(computerWin,myWin)的值
-var oldcWin = [], oldmyWin = [];
-//保存点击撤销悔棋按钮之前赢法统计数组(computerWin,myWin)的值
-var newcWin = [], newmyWin = [];
-
-//悔棋时黑子下棋坐标
-var bx=-1 , by =-1;
-//悔棋时白棋下棋坐标
-var wx=-1 , wy=-1 ;
-
-//存储棋盘落子情况
-//0:无子 1:黑棋 2:白棋
-var chessBoard = [];
-
-//存储所有赢法
-var wins =[];
-
-//赢法统计数组
-var myWin =[];
-var computerWin =[];
-
-var myScore =[];
-var computerScore =[];
-
-//赢法个数
-var count = 0;
-
-window.onload = function () {
-    newGame()
-};
-
-function newGame(){
-    //擦除画布
-    ctx.clearRect(0, 0, chess.width, chess.height);
-    drawBoard(600,20);
-    //初始化变量
-    me = true;
-    over = false;
-    // startClick = false;
-    gameStart = true;
-    count = 0;
-    haveChess = false;
-    bx = -1,by = -1,wx = -1,wy = -1 ;
-    //初始化chessBoard、wins数组,wins[][]棋盘坐标
-    for(var i= 0; i<15;i++){
-        chessBoard[i]=[];
-        wins[i] =[];
-        for(var j = 0;j<15;j++){
-            chessBoard[i][j] =0;
-            wins[i][j]=[];
+        //声明变量
+        this.statementVariate();
+    },
+    //开始新游戏
+    newGame:function(width,radius){
+        //擦除画布
+        this.ctx.clearRect(0, 0, width, width);
+        this.drawBoard(width,radius);
+        //初始化变量
+        this.me = true;
+        this.over = false;
+        // startClick = false;
+        this.gameStart = true;
+        this.count = 0;
+        this.haveChess = false;
+        this.bx = -1;
+        this.by = -1;
+        this.wx = -1;
+        this.wy = -1;
+        //初始化chessBoard、wins数组,wins[][]棋盘坐标
+        for(var i= 0; i<15;i++){
+            this.chessBoard[i]=[];
+            this.wins[i] =[];
+            for(var j = 0;j<15;j++){
+                this.chessBoard[i][j] =0;
+                this.wins[i][j]=[];
+            }
         }
-    }
-    //所有竖线赢法|
-    for (var i = 0; i < 15; i++) {  
-     for (var j = 0; j < 11; j++) {  
-         for (var k = 0; k < 5; k++) {  
-             wins[i][j + k][count] = true;  
+        //所有竖线赢法|
+        for (var i = 0; i < 15; i++) {  
+         for (var j = 0; j < 11; j++) {  
+             for (var k = 0; k < 5; k++) {  
+                 this.wins[i][j + k][this.count] = true;  
+             }  
+             this.count++;  
          }  
-         count++;  
-     }  
-    }  
-    //所有横线线赢法-
-    for (var i = 0; i < 15; i++) {  
-     for (var j = 0; j < 11; j++) {  
-         for (var k = 0; k < 5; k++) {  
-             wins[j + k][i][count] = true;  
+        }  
+        //所有横线线赢法-
+        for (var i = 0; i < 15; i++) {  
+         for (var j = 0; j < 11; j++) {  
+             for (var k = 0; k < 5; k++) {  
+                 this.wins[j + k][i][this.count] = true;  
+             }  
+             this.count++;  
          }  
-         count++;  
-     }  
-    }  
-    //所有斜线赢法 /
-    for (var i = 0; i < 11; i++) {  
-     for (var j = 0; j <11 ; j++) {  
-         for (var k = 0; k < 5; k++) {  
-             wins[i + k][j + k][count] = true;  
+        }  
+        //所有斜线赢法 /
+        for (var i = 0; i < 11; i++) {  
+         for (var j = 0; j <11 ; j++) {  
+             for (var k = 0; k < 5; k++) {  
+                 this.wins[i + k][j + k][this.count] = true;  
+             }  
+             this.count++;  
          }  
-         count++;  
-     }  
-    }  
-    //所有反斜线赢法 \
-    for (var i = 0; i < 11; i++) {  
-     for (var j = 14; j > 3; j--) {  
-         for (var k = 0; k < 5; k++) {  
-             wins[i + k][j - k][count] = true;  
+        }  
+        //所有反斜线赢法 \
+        for (var i = 0; i < 11; i++) {  
+         for (var j = 14; j > 3; j--) {  
+             for (var k = 0; k < 5; k++) {  
+                 this.wins[i + k][j - k][this.count] = true;  
+             }  
+             this.count++;  
          }  
-         count++;  
-     }  
-    }
-    //初始化黑白棋落子赢法
-    for(var i = 0;i<count;i++){
-        myWin[i]=0;
-        computerWin[i] =0;
-    }
+        }
+        //初始化黑白棋落子赢法
+        for(var i = 0;i<this.count;i++){
+            this.myWin[i]=0;
+            this.computerWin[i] =0;
+        }
+    },
+    //画棋盘
+    drawBoard:function(width,radius){
+        this.ctx.beginPath();  
+        for (var i = 0; i < 15; i++) {  
+            //横线
+            this.ctx.moveTo(radius, radius + i * 2*radius);  
+            this.ctx.lineTo(width-radius, radius + i * 2*radius); 
+            //竖线 
+            this.ctx.moveTo(radius + i * 2*radius, radius);  
+            this.ctx.lineTo(radius + i * 2*radius, width-radius);  
+        }  
+        this.ctx.stroke();  
+        // ctx.strokeStyle = "#ccc";
+        this.ctx.closePath();
+    },
+    //画棋子
+    oneStep:function(radius,i, j, me){
+        var r = radius>10?radius-5:radius;
+        this.ctx.beginPath();  
+        this.ctx.arc(radius + i * 2*radius, r + j * 2*radius, r, 0, 2 * Math.PI);  
+        var gradient = this.ctx.createRadialGradient(radius + i * 2*radius + 2, radius + j * 2*radius - 2, r, radius + i * 2*radius + 2, r + j * 2*radius - 2, 0);  
+        if (me) {  
+            gradient.addColorStop(0, "#0A0A0A");  
+            gradient.addColorStop(1, "#636766");  
+        }  
+        else {  
+            gradient.addColorStop(0, "#c8c8c8");  
+            gradient.addColorStop(1, "#F9F9F9");  
+        }  
+        this.ctx.fillStyle = gradient;  
+        this.ctx.fill();  
+        this.ctx.closePath();  
+    },
+    //初始化变量
+    statementVariate:function(){
+        //me:true:黑棋(玩家) false:白棋
+        this.me = true;
+        this.over = false;
 
-}
+        //棋盘上是否有子
+        this.haveChess = false;
+        //是否点击了悔棋按钮
+        this.retrBtn = false;
+        //是否点击了撤销悔棋按钮
+        this.backBtn = false;
+        //保存点击悔棋按钮之前赢法统计数组(computerWin,myWin)的值
+        this.oldcWin = [], oldmyWin = [];
+        //保存点击撤销悔棋按钮之前赢法统计数组(computerWin,myWin)的值
+        this.newcWin = [], newmyWin = [];
 
-//画棋盘
-function  drawBoard(w,r){
-    ctx.beginPath();  
-    for (var i = 0; i < 15; i++) {  
-        //横线
-        ctx.moveTo(r, r + i * 2*r);  
-        ctx.lineTo(w-r, r + i * 2*r); 
-        //竖线 
-        ctx.moveTo(r + i * 2*r, r);  
-        ctx.lineTo(r + i * 2*r, w-r);  
-    }  
-    ctx.stroke();  
-    // ctx.strokeStyle = "#ccc";
-    ctx.closePath();
-}
+        //悔棋时黑子下棋坐标
+        this.bx=-1;
+        this.by =-1;
+        //悔棋时白棋下棋坐标
+        this.wx=-1;
+        this.wy=-1 ;
 
-//画棋子
-function oneStep(i, j, me) {  
-    ctx.beginPath();  
-    ctx.arc(20 + i * 2*20, 15 + j * 2*20, 15, 0, 2 * Math.PI);  
-    var gradient = ctx.createRadialGradient(20 + i * 2*20 + 2, 20 + j * 2*20 - 2, 15, 20 + i * 2*20 + 2, 15 + j * 2*20 - 2, 0);  
-    if (me) {  
-        gradient.addColorStop(0, "#0A0A0A");  
-        gradient.addColorStop(1, "#636766");  
-    }  
-    else {  
-        gradient.addColorStop(0, "#c8c8c8");  
-        gradient.addColorStop(1, "#F9F9F9");  
-    }  
-    ctx.fillStyle = gradient;  
-    ctx.fill();  
-    ctx.closePath();  
-}  
-//玩家落子事件
-chess.onclick = function (e) {
-    myClick(e);
-}
-//落子
-function myClick(e){
-    haveChess = true;
-    if(over){
-        return;
-    }
-    if(!me){
-        return;
-    }
-    var x = e.offsetX;
-    var y = e.offsetY;
-    i = Math.floor(x / (2*20));  
-    j = Math.floor(y / (2*20)); 
-    if(chessBoard[i][j] == 0){
-        oneStep(i, j, me); 
-        chessBoard[i][j] = 1;
-        bx = i;
-        by = j;
-        if(retrBtn&&!backBtn){
-            //retrBtn:防止点悔棋后，再下子时撤销的老棋子被画出来 
-            //backBtn:防止点击撤销悔棋，再下棋时高亮的棋子一直高亮
-            wx= -1,wy =-1;
+        //存储棋盘落子情况
+        //0:无子 1:黑棋 2:白棋
+        this.chessBoard = [];
+
+        //存储所有赢法
+        this.wins =[];
+
+        //赢法统计数组
+        this.myWin =[];
+        this.computerWin =[];
+
+        this.myScore =[];
+        this.computerScore =[];
+
+        //赢法个数
+        this.count = 0;
+    },
+    //按钮绑定事件
+    bindEvents:function(radius,width){
+        var self=this;
+        //玩家落子事件
+        self.chess.onclick =function(e){
+            self.haveChess = true;
+            if(self.over){
+                return;
+            }
+            if(!self.me){
+                return;
+            }
+            var x = e.offsetX;
+            var y = e.offsetY;
+            i = Math.floor(x / (2*20));  
+            j = Math.floor(y / (2*20)); 
+            if(self.chessBoard[i][j] == 0){
+                self.oneStep(radius,i, j, self.me); 
+                self.chessBoard[i][j] = 1;
+                self.bx = i;
+                self.by = j;
+                if(self.retrBtn&&!self.backBtn){
+                    //retrBtn:防止点悔棋后，再下子时撤销的老棋子被画出来 
+                    //backBtn:防止点击撤销悔棋，再下棋时高亮的棋子一直高亮
+                    self.wx= -1,self.wy =-1;
+                }
+                
+                self.backBtn = false;
+                self.retrBtn = false;
+                //为悔棋功能保存最后落子的前一次落子的赢法数组
+                //concat()深拷贝
+                self.oldmyWin = self.myWin.concat();
+                self.oldcWin = self.computerWin.concat();
+                for(var k =0 ;k<self.count;k++){
+                    if(self.wins[i][j][k]){
+                        self.myWin[k]++;
+                        self.computerWin[k] = -1;
+                        if(self.myWin[k] ==5){
+                            self.over = true;
+                            setTimeout(function () {
+                                self.gameOver(width,radius,self.me);
+                                return;
+                            }, 100)
+                        }
+                    }
+                }
+                //为撤销悔棋功能保存最后一次落子的赢法数组
+                self.newmyWin = self.myWin.concat();
+                self.newcWin = self.computerWin.concat();
+                if(!self.over){
+                    self.me = !self.me;
+                    setTimeout(function(){
+                        self.computerAI(radius,width,self.wx,self.wy,true);
+                    }, 200);
+                }
+            }
+        }
+        //点击重新开始按钮
+        self.start.onclick = function () {
+            if (self.haveChess) {
+                if (window.confirm('是否重新开始游戏？')) {
+                    self.newGame(width,radius);
+                    self.haveChess = false;
+                }
+            } 
+        }
+        //点击悔棋按钮
+        self.retract.onclick = function () {
+            var r=radius;
+            if(!self.haveChess){
+                return;
+            }
+            self.retrBtn = true;
+            self.chessBoard[self.bx][self.by] = 0;
+            self.chessBoard[self.wx][self.wy] = 0;
+            //擦除棋子
+            self.ctx.clearRect(self.bx * (2*r), self.by * (2*r), (2*r), (2*r));
+            self.ctx.clearRect(self.wx * (2*r), self.wy * (2*r), (2*r), (2*r));
+            //补齐网格
+            self.ctx.beginPath();
+            self.ctx.moveTo(self.bx * (2*r), self.by * (2*r) + r);
+            self.ctx.lineTo(self.bx * (2*r) + (2*r), self.by * (2*r) + r);
+            self.ctx.moveTo(self.bx * (2*r) + r, self.by * (2*r));
+            self.ctx.lineTo(self.bx * (2*r) + r, self.by * (2*r) + (2*r));
+            self.ctx.moveTo(self.wx * (2*r), self.wy * (2*r) + r);
+            self.ctx.lineTo(self.wx * (2*r) + (2*r), self.wy * (2*r) + r);
+            self.ctx.moveTo(self.wx * (2*r) + r, self.wy * (2*r));
+            self.ctx.lineTo(self.wx * (2*r) + r, self.wy * (2*r) + (2*r));
+            self.ctx.stroke();
+            self.ctx.closePath();
+            //减去悔棋位置的赢法
+            self.myWin= self.oldmyWin.concat();
+            self.computerWin= self.oldcWin.concat();
+             for(var k =0 ;k<self.count;k++){
+                    if(self.wins[self.bx][self.by][k]){
+                        if(self.myWin[k] ==4){
+                            self.myWin[k]--;
+                        }
+                    }
+                }
+
+            self.computerAI(radius,width);
+        }
+
+        //撤销悔棋
+        self.backout.onclick = function () {
+            if (self.retrBtn) {
+                self.chessBoard[self.bx][self.by] = 2;
+                self.chessBoard[self.wx][self.wy] = 1;
+                self.oneStep(radius,self.bx, self.by, 1);
+                self.heightLight(radius,self.wx,self.wy);
+                self.myWin = self.newmyWin.concat();
+                self.computerWin= self.newcWin.concat();
+                self.computerAI(radius,width);
+                self.backBtn = true;
+            }
+        }
+    },
+    //计算机AI
+    computerAI:function(radius,width,wx,wy,isDraw){
+        if(!this.retrBtn){
+            this.oneStep(radius,wx,wy,0);
+        }
+        this.myScore =[];
+        this.computerScore =[];
+        //保存最高分数
+        var max = 0;
+        //最高分数坐标
+        var u = 0, v = 0;
+        //初始化数组
+        for(var i = 0; i<15;i++){
+            this.myScore[i]=[];
+            this.computerScore[i]=[];
+            for(var j = 0;j<15;j++){
+                this.myScore[i][j]=0;
+                this.computerScore[i][j]=0;
+            }
+        }
+        //遍历棋盘
+        for (var i = 0; i < 15; i++) {
+            for (var j = 0; j < 15; j++) {
+                if (this.chessBoard[i][j] == 0) {
+                    for (var k = 0; k < this.count; k++) {
+                        if (this.wins[i][j][k]) {
+                            if (this.myWin[k] == 1) {
+                                //第K种赢法 黑棋(玩家)落了第一颗子
+                                this.myScore[i][j] += 200;
+                            } else if (this.myWin[k] == 2) {
+                                this.myScore[i][j] += 1000;
+                            } else if (this.myWin[k] == 3) {
+                                this.myScore[i][j] += 2000;
+                            } else if (this.myWin[k] == 4) {
+                                this.myScore[i][j] += 10000;
+                            }
+                            if (this.computerWin[k] == 1) {
+                                //第K种赢法 白棋(电脑)落了第一颗子
+                                this.computerScore[i][j] += 200;
+                            } else if (this.computerWin[k] == 2) {
+                                this.computerScore[i][j] += 1200;
+                            } else if (this.computerWin[k] == 3) {
+                                this.computerScore[i][j] += 2400;
+                            } else if (this.computerWin[k] == 4) {
+                                this.computerScore[i][j] += 20000;
+                            }
+                        }
+                    }
+                    if (this.myScore[i][j] > max) {
+                        max = this.myScore[i][j];
+                        u = i;
+                        v = j;
+                    } else if (this.myScore[i][j] == max) {
+                        if (this.computerScore[i][j] > this.computerScore[u][v]) {
+                            u = i;
+                            v = j;
+                        }
+                    }
+                    if (this.computerScore[i][j] > max) {
+                        max = this.computerScore[i][j];
+                        u = i;
+                        v = j;
+                    } else if (this.computerScore[i][j] == max) {
+                        if (this.myScore[i][j] > this.myScore[u][v]) {
+                            u = i;
+                            v = j;
+                        }
+                    }
+                }
+            }
         }
         
-        backBtn = false;
-        retrBtn = false;
-        //为悔棋功能保存最后落子的前一次落子的赢法数组
-        //concat()深拷贝
-        oldmyWin = myWin.concat();
-        oldcWin = computerWin.concat();
-        for(var k =0 ;k<count;k++){
-            if(wins[i][j][k]){
-                myWin[k]++;
-                computerWin[k] = -1;
-                if(myWin[k] ==5){
-                    over = true;
-                    setTimeout(function () {
-                        gameOver(me);
-                        return;
-                    }, 100)
-                }
-            }
-        }
-        //为撤销悔棋功能保存最后一次落子的赢法数组
-        newmyWin = myWin.concat();
-        newcWin = computerWin.concat();
-        if(!over){
-            me = !me;
-            setTimeout(function(){
-                computerAI(wx,wy,true);
-            }, 200);
-        }
-    }
-}
-
-//计算机AI
-function computerAI(wx,wy,isDraw){
-    if(!retrBtn){
-        oneStep(wx,wy,0);
-    }
-    myScore =[];
-    computerScore =[];
-    //保存最高分数
-    var max = 0;
-    //最高分数坐标
-    var u = 0, v = 0;
-    //初始化数组
-    for(var i = 0; i<15;i++){
-        myScore[i]=[];
-        computerScore[i]=[];
-        for(var j = 0;j<15;j++){
-            myScore[i][j]=0;
-            computerScore[i][j]=0;
-        }
-    }
-    //遍历棋盘
-    for (var i = 0; i < 15; i++) {
-        for (var j = 0; j < 15; j++) {
-            if (chessBoard[i][j] == 0) {
-                for (var k = 0; k < count; k++) {
-                    if (wins[i][j][k]) {
-                        if (myWin[k] == 1) {
-                            //第K种赢法 黑棋(玩家)落了第一颗子
-                            myScore[i][j] += 200;
-                        } else if (myWin[k] == 2) {
-                            myScore[i][j] += 1000;
-                        } else if (myWin[k] == 3) {
-                            myScore[i][j] += 2000;
-                        } else if (myWin[k] == 4) {
-                            myScore[i][j] += 10000;
-                        }
-                        if (computerWin[k] == 1) {
-                            //第K种赢法 白棋(电脑)落了第一颗子
-                            computerScore[i][j] += 200;
-                        } else if (computerWin[k] == 2) {
-                            computerScore[i][j] += 1200;
-                        } else if (computerWin[k] == 3) {
-                            computerScore[i][j] += 2400;
-                        } else if (computerWin[k] == 4) {
-                            computerScore[i][j] += 20000;
-                        }
-                    }
-                }
-                if (myScore[i][j] > max) {
-                    max = myScore[i][j];
-                    u = i;
-                    v = j;
-                } else if (myScore[i][j] == max) {
-                    if (computerScore[i][j] > computerScore[u][v]) {
-                        u = i;
-                        v = j;
-                    }
-                }
-                if (computerScore[i][j] > max) {
-                    max = computerScore[i][j];
-                    u = i;
-                    v = j;
-                } else if (computerScore[i][j] == max) {
-                    if (myScore[i][j] > myScore[u][v]) {
-                        u = i;
-                        v = j;
+        if(isDraw){
+            this.heightLight(radius,u,v);
+            this.chessBoard[u][v] =2;
+            this.wx = u;
+            this.wy = v;
+            for(var k =0 ;k<this.count;k++){
+                if(this.wins[u][v][k]){
+                    this.computerWin[k]++;
+                    this.oldmyWin[k] = this.myWin[k];
+                    this.myWin[k] = -1;
+                    if(this.computerWin[k] ==5){
+                        this.over = true;
+                        var self = this;
+                        setTimeout(function () {
+                            self.gameOver(width,radius);
+                        }, 100)
                     }
                 }
             }
-        }
-    }
-    
-    if(isDraw){
-        heightLight(u,v);
-        chessBoard[u][v] =2;
-        window.wx = u;
-        window.wy = v;
-        for(var k =0 ;k<count;k++){
-            if(wins[u][v][k]){
-                computerWin[k]++;
-                oldmyWin[k] = myWin[k];
-                myWin[k] = -1;
-                if(computerWin[k] ==5){
-                    over = true;
-                    setTimeout(function () {
-                        gameOver();
-                    }, 100)
-                }
+            if(!this.over){
+                this.me =!this.me;
             }
         }
-        if(!over){
-            me =!me;
-        }
-    }
-}
-
-//结束函数
-function gameOver(me) {
-    if (me) {
-        if (window.confirm('恭喜你，击败了电脑，是否重新开始？')) {
-            newGame();
-        }
-    } else {
-        if (window.confirm('电脑赢了，是否重新开始？')) {
-            newGame();
-        }
-    }
-}
-
-//点击重新开始按钮
-start.onclick = function () {
-    if (haveChess) {
-        if (window.confirm('是否重新开始游戏？')) {
-            newGame();
-            haveChess = false;
-        }
-    } 
-}
-//点击悔棋按钮
-retract.onclick = function () {
-    if(!haveChess){
-        return;
-    }
-    retrBtn = true;
-    chessBoard[bx][by] = 0;
-    chessBoard[wx][wy] = 0;
-    //擦除棋子
-    ctx.clearRect(bx * (2*20), by * (2*20), (2*20), (2*20));
-    ctx.clearRect(wx * (2*20), wy * (2*20), (2*20), (2*20));
-    //补齐网格
-    ctx.beginPath();
-    ctx.moveTo(bx * (2*20), by * (2*20) + 20);
-    ctx.lineTo(bx * (2*20) + (2*20), by * (2*20) + 20);
-    ctx.moveTo(bx * (2*20) + 20, by * (2*20));
-    ctx.lineTo(bx * (2*20) + 20, by * (2*20) + (2*20));
-    ctx.moveTo(wx * (2*20), wy * (2*20) + 20);
-    ctx.lineTo(wx * (2*20) + (2*20), wy * (2*20) + 20);
-    ctx.moveTo(wx * (2*20) + 20, wy * (2*20));
-    ctx.lineTo(wx * (2*20) + 20, wy * (2*20) + (2*20));
-    ctx.stroke();
-    ctx.closePath();
-    //减去悔棋位置的赢法
-    myWin= oldmyWin.concat();
-    computerWin= oldcWin.concat();
-     for(var k =0 ;k<count;k++){
-            if(wins[bx][by][k]){
-                if(myWin[k] ==4){
-                    myWin[k]--;
-                }
+    },
+    //结束游戏
+    gameOver:function(width,radius,me){
+        if (me) {
+            if (window.confirm('恭喜你，击败了电脑，是否重新开始？')) {
+                this.newGame(width,radius);
+            }
+        } else {
+            if (window.confirm('电脑赢了，是否重新开始？')) {
+                this.newGame(width,radius);
             }
         }
-
-    computerAI();
-}
-
-//撤销悔棋
-backout.onclick = function () {
-    if (retrBtn) {
-        chessBoard[bx][by] = 2;
-        chessBoard[wx][wy] = 1;
-        oneStep(bx, by, 1);
-        heightLight(wx,wy);
-        myWin = newmyWin.concat();
-        computerWin= newcWin.concat();
-        computerAI();
-        backBtn = true;
+    },
+    //白棋高亮
+    heightLight:function(radius,i,j){
+        var r = radius>10?radius-5:radius;
+        this.ctx.beginPath();  
+        this.ctx.arc(radius + i * 2*radius, r + j * 2*radius, r, 0, 2 * Math.PI);  
+        var gradient = this.ctx.createRadialGradient(r + i * 2*r + 2, r + j * 2*r - 2, 15, r + i * 2*r + 2, 15 + j * 2*r - 2, 0.2);   
+        gradient.addColorStop(0, "#e2e2e2");  
+        gradient.addColorStop(1, "#F9F9F9");  
+        this.ctx.fillStyle = gradient;  
+        this.ctx.fill();  
+        this.ctx.closePath();         
     }
 }
 
-//给最新下子的黑棋加光环
-function heightLight(i,j){
-    ctx.beginPath();  
-    ctx.arc(20 + i * 2*20, 15 + j * 2*20, 15, 0, 2 * Math.PI);  
-    var gradient = ctx.createRadialGradient(20 + i * 2*20 + 2, 20 + j * 2*20 - 2, 15, 20 + i * 2*20 + 2, 15 + j * 2*20 - 2, 0.2);   
-    gradient.addColorStop(0, "#e2e2e2");  
-    gradient.addColorStop(1, "#F9F9F9");  
-    ctx.fillStyle = gradient;  
-    ctx.fill();  
-    ctx.closePath();  
-}
+

@@ -80,3 +80,45 @@ var newcWin = [], newmyWin = [];
 其实有算法讲解，这个游戏并不是很难，主要注意的就是这几个按钮，尤其是“开始”按钮，这里出现的bug比较多。
 游戏基本完成了，接下来打算将这个游戏改造成面向对象开发，因为平时接触面向对象比较少，都是别写边想下一步干什么面向过程的开发。为了防止出错，所有先提交到远程仓库里，= =！。
 
+***
+2017.10.28修改部分
+### 面向对象开发
+使用面向对象开发，增加加代码的灵活性和扩展性，使得代码整洁明了。
+
+```
+var gbObj={
+    //五子棋的父元素的id
+    parent:'gobangBox',
+    //棋盘width
+    width:600,
+    //棋子半径
+    radius:20
+}
+//五子棋实例
+var goBang = new GoBang(gbObj);
+   
+```
+```
+//GoBang对象
+function GoBang(obj){
+   var parent = document.getElementById(obj.parentID);
+   var width = obj.width;
+   var radius = obj.radius;
+   this.init(parent , width,radius);
+}
+```
+```
+//替换原型对象实现继承
+GoBang.prototype = {
+    constructor:GoBang,
+    init:function(parent , width,radius){
+        //给页面插入元素
+        this.initElements(parent,width);
+        //渲染棋盘
+        this.newGame(width,radius);
+        // //绑定事件
+        this.bindEvents(radius,width);
+    },
+    ...
+}    
+```
